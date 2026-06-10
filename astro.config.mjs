@@ -4,7 +4,7 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://openedinfer.com',
+	site: 'https://open-infer.org',
 	integrations: [
 		starlight({
 			title: 'openinfer',
