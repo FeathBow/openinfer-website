@@ -1,0 +1,53 @@
+---
+title: openinfer
+description: Pure Rust + CUDA LLM inference engine. No PyTorch, no model framework runtime.
+template: splash
+hero:
+  tagline: A from-scratch LLM inference engine in pure Rust + CUDA. No PyTorch, no ONNX, no model framework runtime.
+  image:
+    file: ../../assets/logo.png
+  actions:
+    - text: Get Started
+      link: /getting-started/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/openinfer-project/openinfer
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why openinfer
+
+<CardGrid stagger>
+	<Card title="Rust + CUDA, nothing else" icon="seti:rust">
+		The entire stack — weights loading, paged KV cache, schedulers, kernels —
+		is built from the ground up in Rust and CUDA, with Triton AOT and
+		FlashInfer kernels compiled at build time. Python is build-time only.
+	</Card>
+	<Card title="OpenAI-compatible API" icon="rocket">
+		Serves a `/v1/completions` endpoint with streaming. Point any OpenAI SDK
+		or `curl` at it and start generating.
+	</Card>
+	<Card title="One engine per model" icon="puzzle">
+		No universal model abstraction. Each model line owns its scheduler,
+		kernel plan, and execution path — full attention, hybrid linear
+		attention, MLA, and MoE with expert parallelism.
+	</Card>
+	<Card title="CUDA Graph decode" icon="setting">
+		The decode path is captured as a CUDA graph with pre-allocated buffers,
+		keeping per-token overhead low and decode latency flat across context
+		lengths.
+	</Card>
+</CardGrid>
+
+## Supported models
+
+| Model | Architecture |
+| --- | --- |
+| [Qwen3-4B / 8B](/models/qwen3-4b/) | Full attention, tensor parallel |
+| Qwen3.5-4B | Hybrid: 24 linear + 8 full attention layers |
+| DeepSeek-V4 | MoE + compressor + indexer, 8-GPU |
+| DeepSeek-V2-Lite | MoE + expert parallelism, 2-GPU |
+| Kimi-K2 | MLA + MoE + Marlin INT4, 8-GPU expert parallelism |
