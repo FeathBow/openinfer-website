@@ -10,6 +10,7 @@ export default defineConfig({
 			title: 'openinfer',
 			logo: { src: './src/assets/logo.png' },
 			favicon: '/favicon.png',
+			customCss: ['./src/styles/custom.css'],
 			social: [
 				{
 					icon: 'github',

@@ -1,0 +1,288 @@
+/* openinfer — custom theme
+   Rust-orange accent on a deep navy base, matched to the Pegasus mark. */
+
+:root {
+	--brand: #f1531f; /* rust orange */
+	--brand-2: #ff8a3d; /* warm amber */
+	--brand-cool: #5b8def; /* CUDA blue, used sparingly */
+
+	/* Starlight accent ramp (links, focus rings, primary button) */
+	--sl-color-accent-low: #2c1206;
+	--sl-color-accent: #e64a1d;
+	--sl-color-accent-high: #ffc2ab;
+	--sl-color-text-accent: #ff7a45;
+
+	/* Navy-tinted surfaces */
+	--sl-color-bg: #0b0e16;
+	--sl-color-bg-nav: rgba(11, 14, 22, 0.72);
+	--sl-color-bg-sidebar: #090b12;
+	--sl-color-hairline: #161b29;
+	--sl-color-hairline-light: #232b3d;
+	--sl-color-hairline-shade: #11151f;
+
+	--brand-font-mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono',
+		'Cascadia Code', Menlo, Consolas, monospace;
+}
+
+/* Light theme: keep accent legible, soften surfaces */
+:root[data-theme='light'] {
+	--sl-color-accent-low: #ffe6da;
+	--sl-color-accent: #d6431a;
+	--sl-color-accent-high: #5a1c0c;
+	--sl-color-text-accent: #c83e16;
+	--sl-color-bg: #fbfaf9;
+	--sl-color-bg-sidebar: #f4f2f0;
+}
+
+/* Ambient glow behind the whole page, sits below all content. */
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(48rem 32rem at 78% -8%, rgba(241, 83, 31, 0.12), transparent 60%),
+		radial-gradient(42rem 32rem at 8% 2%, rgba(91, 141, 239, 0.1), transparent 55%);
+}
+:root[data-theme='light'] body::before {
+	background:
+		radial-gradient(48rem 32rem at 78% -8%, rgba(241, 83, 31, 0.1), transparent 60%),
+		radial-gradient(42rem 32rem at 8% 2%, rgba(91, 141, 239, 0.08), transparent 55%);
+}
+
+/* ───────────────────────── Hero ───────────────────────── */
+
+.hero {
+	position: relative;
+	padding-block: clamp(2rem, 8vh, 5rem);
+}
+
+/* Full-bleed glow + faint engineering grid behind the hero only */
+.hero::before {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: -6rem;
+	width: 100vw;
+	height: 46rem;
+	transform: translateX(-50%);
+	z-index: -1;
+	pointer-events: none;
+	background-image:
+		radial-gradient(60rem 26rem at 50% 0%, rgba(241, 83, 31, 0.16), transparent 62%),
+		linear-gradient(to right, var(--sl-color-hairline) 1px, transparent 1px),
+		linear-gradient(to bottom, var(--sl-color-hairline) 1px, transparent 1px);
+	background-size: 100% 100%, 3.2rem 3.2rem, 3.2rem 3.2rem;
+	-webkit-mask-image: radial-gradient(60% 60% at 50% 30%, #000, transparent 100%);
+	mask-image: radial-gradient(60% 60% at 50% 30%, #000, transparent 100%);
+	opacity: 0.7;
+}
+
+.hero img {
+	border-radius: 22px;
+	filter: drop-shadow(0 8px 28px rgba(0, 0, 0, 0.45))
+		drop-shadow(0 0 64px rgba(241, 83, 31, 0.28));
+}
+
+.hero h1 {
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	background: linear-gradient(180deg, #fff 30%, #b9c2d6);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+:root[data-theme='light'] .hero h1 {
+	background: linear-gradient(180deg, #1a1f2e 30%, #4a5168);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.hero .tagline {
+	font-family: var(--brand-font-mono);
+	font-size: clamp(1.05rem, 1rem + 0.8vw, 1.6rem);
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	color: var(--sl-color-white);
+	max-width: 32ch;
+}
+
+/* Action buttons */
+.hero .actions a {
+	border-radius: 0.7rem;
+	font-weight: 600;
+	transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.hero .actions a.primary {
+	background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+	border-color: transparent;
+	color: #fff;
+	box-shadow: 0 8px 24px -8px rgba(241, 83, 31, 0.6);
+}
+.hero .actions a.primary:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 30px -8px rgba(241, 83, 31, 0.7);
+}
+.hero .actions a.minimal {
+	border: 1px solid var(--sl-color-hairline-light);
+}
+.hero .actions a.minimal:hover {
+	transform: translateY(-2px);
+	border-color: var(--sl-color-text-accent);
+	background: color-mix(in srgb, var(--brand) 8%, transparent);
+}
+
+/* ───────────────── Landing-only (pages with a hero) ───────────────── */
+
+body:has(.hero) .sl-markdown-content {
+	margin-top: 1rem;
+}
+
+/* Lead paragraph under the hero */
+.lead {
+	text-align: center;
+	max-width: 46ch;
+	margin-inline: auto;
+	font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+	line-height: 1.6;
+	color: var(--sl-color-gray-2);
+}
+.lead .hl {
+	color: var(--sl-color-white);
+	font-weight: 600;
+	white-space: nowrap;
+	background: linear-gradient(120deg, var(--brand) 0%, var(--brand-2) 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+/* Center section intros on the landing page */
+body:has(.hero) .sl-markdown-content > h2 {
+	text-align: center;
+	font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+	letter-spacing: -0.02em;
+	margin-top: 4rem;
+	border: none;
+}
+
+/* Stats strip */
+.stats {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1px;
+	margin: 2.5rem auto 0;
+	max-width: 56rem;
+	background: var(--sl-color-hairline);
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 1rem;
+	overflow: hidden;
+}
+.stat {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: 1.4rem 1rem;
+	background: color-mix(in srgb, var(--sl-color-bg) 92%, #fff 0%);
+	text-align: center;
+}
+.stat-value {
+	font-family: var(--brand-font-mono);
+	font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.4rem);
+	font-weight: 800;
+	line-height: 1;
+	background: linear-gradient(180deg, var(--brand-2), var(--brand));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+.stat-label {
+	font-size: 0.78rem;
+	line-height: 1.4;
+	color: var(--sl-color-gray-3);
+	text-wrap: balance;
+}
+@media (max-width: 50rem) {
+	.stats {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ───────────────────────── Cards ───────────────────────── */
+
+.card-grid {
+	margin-top: 2rem !important;
+}
+.card {
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 1rem;
+	background: linear-gradient(
+		180deg,
+		color-mix(in srgb, var(--sl-color-white) 3%, transparent),
+		transparent 60%
+	);
+	transition: transform 0.18s ease, border-color 0.18s ease,
+		box-shadow 0.18s ease;
+}
+.card:hover {
+	transform: translateY(-3px);
+	border-color: color-mix(in srgb, var(--brand) 45%, var(--sl-color-hairline));
+	box-shadow: 0 16px 40px -24px rgba(241, 83, 31, 0.55);
+}
+.card .icon {
+	color: var(--brand-2);
+	border: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
+	background: color-mix(in srgb, var(--brand) 12%, transparent);
+	border-radius: 0.6rem;
+	padding: 0.35rem;
+}
+.card .title {
+	letter-spacing: -0.01em;
+}
+
+/* ───────────────────────── Tables ───────────────────────── */
+
+.sl-markdown-content table {
+	border-collapse: separate;
+	border-spacing: 0;
+	width: 100%;
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 0.9rem;
+	overflow: hidden;
+}
+.sl-markdown-content th {
+	background: color-mix(in srgb, var(--sl-color-white) 4%, transparent);
+	font-size: 0.78rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--sl-color-gray-2);
+}
+.sl-markdown-content th,
+.sl-markdown-content td {
+	border: none;
+	border-bottom: 1px solid var(--sl-color-hairline);
+	padding: 0.7rem 1rem;
+}
+.sl-markdown-content tr:last-child td {
+	border-bottom: none;
+}
+.sl-markdown-content tbody tr {
+	transition: background 0.15s ease;
+}
+.sl-markdown-content tbody tr:hover {
+	background: color-mix(in srgb, var(--brand) 6%, transparent);
+}
+
+/* Inline code accent on the landing page */
+body:has(.hero) .sl-markdown-content :not(pre) > code {
+	color: var(--sl-color-text-accent);
+	border-color: color-mix(in srgb, var(--brand) 25%, var(--sl-color-hairline));
+}
+
+/* Nav: a hairline that picks up the brand on scroll */
+.hero ~ * {
+	position: relative;
+	z-index: 1;
+}

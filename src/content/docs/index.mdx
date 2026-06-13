@@ -3,7 +3,7 @@ title: openinfer
 description: Pure Rust + CUDA LLM inference engine. No PyTorch, no model framework runtime.
 template: splash
 hero:
-  tagline: A from-scratch LLM inference engine in pure Rust + CUDA. No PyTorch, no ONNX, no model framework runtime.
+  tagline: No Python at runtime. No GC. No framework tax.
   image:
     file: ../../assets/logo.png
   actions:
@@ -18,17 +18,42 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+<p class="lead">
+	A from-scratch LLM inference engine in <span class="hl">pure Rust + CUDA</span>.
+	No PyTorch, no ONNX, no model framework runtime — just weights, kernels, and tokens.
+</p>
+
+<div class="stats">
+	<div class="stat">
+		<span class="stat-value">0</span>
+		<span class="stat-label">Python · ONNX · framework at runtime</span>
+	</div>
+	<div class="stat">
+		<span class="stat-value">5</span>
+		<span class="stat-label">model lines, one engine each</span>
+	</div>
+	<div class="stat">
+		<span class="stat-value">8&#8209;GPU</span>
+		<span class="stat-label">expert parallelism</span>
+	</div>
+	<div class="stat">
+		<span class="stat-value">Rust</span>
+		<span class="stat-label">+ CUDA, loader to kernel</span>
+	</div>
+</div>
+
 ## Why openinfer
 
 <CardGrid stagger>
 	<Card title="Rust + CUDA, nothing else" icon="seti:rust">
-		The entire stack — weights loading, paged KV cache, schedulers, kernels —
+		The entire stack — weight loading, paged KV cache, schedulers, kernels —
 		is built from the ground up in Rust and CUDA, with Triton AOT and
-		FlashInfer kernels compiled at build time. Python is build-time only.
+		FlashInfer kernels compiled at build time. Memory-safe orchestration,
+		hand-written kernels, and not a byte of Python in the serving path.
 	</Card>
 	<Card title="OpenAI-compatible API" icon="rocket">
 		Serves a `/v1/completions` endpoint with streaming. Point any OpenAI SDK
-		or `curl` at it and start generating.
+		or `curl` at it and start generating — no client changes required.
 	</Card>
 	<Card title="One engine per model" icon="puzzle">
 		No universal model abstraction. Each model line owns its scheduler,
@@ -41,6 +66,17 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 		lengths.
 	</Card>
 </CardGrid>
+
+## Talk to it like OpenAI
+
+```bash
+curl -s http://localhost:8000/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "The capital of France is", "max_tokens": 32}'
+```
+
+Set the base URL to `http://localhost:8000/v1` and any OpenAI SDK works
+unchanged. Add `"stream": true` for token-by-token streaming.
 
 ## Supported models
 
