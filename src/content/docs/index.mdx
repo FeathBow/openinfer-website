@@ -10,6 +10,10 @@ hero:
     - text: Get Started
       link: /getting-started/
       icon: right-arrow
+    - text: Blogs
+      link: /blog/
+      icon: right-arrow
+      variant: minimal
     - text: View on GitHub
       link: https://github.com/openinfer-project/openinfer
       icon: external
@@ -64,6 +68,10 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 		The decode path is captured as a CUDA graph with pre-allocated buffers,
 		keeping per-token overhead low and decode latency flat across context
 		lengths.
+	</Card>
+	<Card title="Blogs" icon="rocket">
+		Read the [latest posts](/blog/) for release notes, benchmark writeups,
+		runtime design notes, and model bring-up stories.
 	</Card>
 </CardGrid>
 
