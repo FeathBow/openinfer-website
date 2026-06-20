@@ -1,5 +1,5 @@
 ---
-title: "Green Contexts"
+title: "Co-locating Prefill and Decode on One GPU: Green Contexts for Higher Throughput"
 description: A direct English translation of the Green Contexts blog.
 ---
 

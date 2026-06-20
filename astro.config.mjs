@@ -29,7 +29,7 @@ export default defineConfig({
 							slug: 'blog/openinfer-010',
 						},
 						{
-							label: 'Green Contexts',
+							label: 'Co-locating Prefill and Decode',
 							slug: 'blog/green-ctx',
 						},
 					],
