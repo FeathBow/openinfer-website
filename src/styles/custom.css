@@ -1,5 +1,7 @@
 /* openinfer — custom theme
-   Rust-orange accent on a deep navy base, matched to the Pegasus mark. */
+   Rust-orange accent on a deep navy base, matched to the Pegasus mark.
+   Aesthetic: Tailscale-style minimalism — flat, hairline borders, no glows,
+   no shadows, generous whitespace, monospace for technical labels. */
 
 :root {
 	--brand: #f1531f; /* rust orange */
@@ -22,116 +24,301 @@
 
 	--brand-font-mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono',
 		'Cascadia Code', Menlo, Consolas, monospace;
+
+	/* Small radii — Tailscale-style engineering restraint. */
+	--oi-radius: 0.4rem;
+	--oi-radius-lg: 0.5rem;
 }
 
-/* Light theme: keep accent legible, soften surfaces */
+/* Light theme: keep accent legible, soften surfaces.
+   NOTE: custom.css is unlayered, so it beats Starlight's layered props.css
+   regardless of specificity. That means every token we set in the dark `:root`
+   above must be explicitly re-set here for light mode, or it leaks through. */
 :root[data-theme='light'] {
 	--sl-color-accent-low: #ffe6da;
 	--sl-color-accent: #d6431a;
 	--sl-color-accent-high: #5a1c0c;
 	--sl-color-text-accent: #c83e16;
 	--sl-color-bg: #fbfaf9;
+	--sl-color-bg-nav: rgba(251, 250, 249, 0.82);
 	--sl-color-bg-sidebar: #f4f2f0;
-}
-
-/* Ambient glow behind the whole page, sits below all content. */
-body::before {
-	content: '';
-	position: fixed;
-	inset: 0;
-	z-index: 0;
-	pointer-events: none;
-	background:
-		radial-gradient(48rem 32rem at 78% -8%, rgba(241, 83, 31, 0.12), transparent 60%),
-		radial-gradient(42rem 32rem at 8% 2%, rgba(91, 141, 239, 0.1), transparent 55%);
-}
-:root[data-theme='light'] body::before {
-	background:
-		radial-gradient(48rem 32rem at 78% -8%, rgba(241, 83, 31, 0.1), transparent 60%),
-		radial-gradient(42rem 32rem at 8% 2%, rgba(91, 141, 239, 0.08), transparent 55%);
+	--sl-color-hairline: #e7e2db;
+	--sl-color-hairline-light: #d3cdc4;
+	--sl-color-hairline-shade: #f2efe9;
 }
 
 /* ───────────────────────── Hero ───────────────────────── */
 
 .hero {
 	position: relative;
-	padding-block: clamp(2rem, 8vh, 5rem);
+	padding-block: clamp(2.5rem, 10vh, 6rem);
+	grid-template-columns: 1fr !important;
 }
-
-/* Full-bleed glow + faint engineering grid behind the hero only */
-.hero::before {
-	content: '';
-	position: absolute;
-	left: 50%;
-	top: -6rem;
-	width: 100vw;
-	height: 46rem;
-	transform: translateX(-50%);
-	z-index: -1;
-	pointer-events: none;
-	background-image:
-		radial-gradient(60rem 26rem at 50% 0%, rgba(241, 83, 31, 0.16), transparent 62%),
-		linear-gradient(to right, var(--sl-color-hairline) 1px, transparent 1px),
-		linear-gradient(to bottom, var(--sl-color-hairline) 1px, transparent 1px);
-	background-size: 100% 100%, 3.2rem 3.2rem, 3.2rem 3.2rem;
-	-webkit-mask-image: radial-gradient(60% 60% at 50% 30%, #000, transparent 100%);
-	mask-image: radial-gradient(60% 60% at 50% 30%, #000, transparent 100%);
-	opacity: 0.7;
+.hero .stack,
+.hero .copy,
+.hero .actions {
+	text-align: center;
+	align-items: center;
+	justify-content: center;
 }
-
-.hero img {
-	border-radius: 22px;
-	filter: drop-shadow(0 8px 28px rgba(0, 0, 0, 0.45))
-		drop-shadow(0 0 64px rgba(241, 83, 31, 0.28));
+.hero .copy > * {
+	max-width: 46ch;
 }
 
 .hero h1 {
-	font-weight: 800;
+	font-weight: 700;
 	letter-spacing: -0.03em;
-	background: linear-gradient(180deg, #fff 30%, #b9c2d6);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
+	line-height: 1.05;
+	color: #f3f5fa;
+	/* No full gradient — cool neutral white, accent reserved for one word. */
+	background: none;
+	-webkit-text-fill-color: initial;
 }
 :root[data-theme='light'] .hero h1 {
-	background: linear-gradient(180deg, #1a1f2e 30%, #4a5168);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
+	color: #14171f;
+	background: none;
+	-webkit-text-fill-color: initial;
+}
+/* The one highlighted word in the headline — only place the brand speaks loud.
+   Solid color, no gradient. */
+.hero h1 .hl-word {
+	color: var(--brand-2);
 }
 
 .hero .tagline {
-	font-family: var(--brand-font-mono);
-	font-size: clamp(1.05rem, 1rem + 0.8vw, 1.6rem);
-	font-weight: 600;
-	letter-spacing: -0.01em;
-	color: var(--sl-color-white);
-	max-width: 32ch;
+	font-size: clamp(1rem, 0.95rem + 0.4vw, 1.2rem);
+	line-height: 1.55;
+	color: var(--sl-color-gray-2);
+	max-width: 38ch;
+	font-weight: 400;
 }
 
-/* Action buttons */
-.hero .actions a {
-	border-radius: 0.7rem;
-	font-weight: 600;
-	transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+/* Action buttons — flat, matched visual weight. No shadows, no hover lift;
+   hover is communicated by background/border color change only.
+   Override Starlight's pill (999rem) and the minimal variant's
+   `padding-inline: 0` (which makes it look like a bare link next to primary). */
+.hero .actions {
+	gap: 0.75rem;
+	flex-wrap: wrap;
+	justify-content: center;
 }
+.hero .actions a {
+	border-radius: var(--oi-radius);
+	font-weight: 600;
+	padding: 0.65rem 1.1rem !important;
+	font-size: var(--sl-text-base) !important;
+	line-height: 1.2;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Primary: solid rust-orange. Hover deepens, no shadow, no lift. */
 .hero .actions a.primary {
-	background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
-	border-color: transparent;
+	background: var(--brand);
+	border: 1px solid var(--brand);
 	color: #fff;
-	box-shadow: 0 8px 24px -8px rgba(241, 83, 31, 0.6);
 }
 .hero .actions a.primary:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 12px 30px -8px rgba(241, 83, 31, 0.7);
+	background: var(--brand-2);
+	border-color: var(--brand-2);
 }
+
+/* Secondary/minimal: real button, not a bare link. Hairline border + near-flat
+   surface. `--sl-color-white` is semantic (white in dark, dark in light) so the
+   text + icon stay legible in both themes. */
 .hero .actions a.minimal {
+	background: transparent;
 	border: 1px solid var(--sl-color-hairline-light);
+	color: var(--sl-color-white);
+	padding-inline: 1.1rem !important;
 }
 .hero .actions a.minimal:hover {
-	transform: translateY(-2px);
-	border-color: var(--sl-color-text-accent);
-	background: color-mix(in srgb, var(--brand) 8%, transparent);
+	border-color: color-mix(in srgb, var(--brand) 50%, var(--sl-color-hairline-light));
+	color: var(--brand-2);
+}
+
+/* GitHub button: brand mark sits before the label. */
+.hero .actions a.github-btn {
+	flex-direction: row-reverse;
+}
+
+/* ───────────────────────── Blog feature cards ─────────────────────────
+   Prime real estate on the landing page. Two posts, banner image, date,
+   title, excerpt, and a "Read more" affordance. */
+
+.blog-feature {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1.25rem;
+	margin: 2rem 0 1rem;
+}
+@media (max-width: 50rem) {
+	.blog-feature {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+}
+
+.blog-card {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: var(--oi-radius-lg);
+	background: transparent;
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	transition: border-color 0.15s ease;
+}
+.blog-card:hover {
+	border-color: var(--sl-color-hairline-light);
+}
+.blog-card img {
+	display: block;
+	width: 100%;
+	height: 12rem;
+	object-fit: cover;
+	background: var(--sl-color-hairline);
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+.blog-card-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.55rem;
+	padding: 1.1rem 1.25rem 1.25rem;
+}
+.blog-date {
+	font-family: var(--brand-font-mono);
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--brand-2);
+	letter-spacing: 0.02em;
+}
+.blog-title {
+	margin: 0;
+	font-size: clamp(1.05rem, 1rem + 0.3vw, 1.25rem);
+	font-weight: 700;
+	line-height: 1.3;
+	letter-spacing: -0.01em;
+	color: var(--sl-color-white);
+}
+:root[data-theme='light'] .blog-title {
+	color: #14171f;
+}
+.blog-desc {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.55;
+	color: var(--sl-color-gray-3);
+}
+.blog-more {
+	margin-top: 0.25rem;
+	font-family: var(--brand-font-mono);
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--sl-color-text-accent);
+	transition: transform 0.15s ease;
+}
+.blog-card:hover .blog-more {
+	transform: translateX(3px);
+}
+
+/* ───────────────────────── Why openinfer — alternating rows ─────────────────
+   Linear/Modal-style feature rows: text on one side, benchmark chart on the
+   other, alternating sides. Each point gets room to breathe. */
+
+.why-rows {
+	margin: 3rem 0 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(4rem, 3rem + 4vw, 7rem);
+}
+.why-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(2rem, 1.5rem + 2vw, 4rem);
+	align-items: center;
+}
+/* Flip even rows: image on the left, text on the right. */
+.why-row:nth-child(even) .why-text {
+	order: 2;
+}
+.why-row:nth-child(even) .why-visual {
+	order: 1;
+}
+@media (max-width: 50rem) {
+	.why-row {
+		grid-template-columns: 1fr;
+		gap: 1.25rem;
+	}
+	.why-row:nth-child(even) .why-text,
+	.why-row:nth-child(even) .why-visual {
+		order: 0;
+	}
+}
+
+.why-text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+.why-eyebrow {
+	font-family: var(--brand-font-mono);
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--brand-2);
+}
+.why-title {
+	margin: 0;
+	font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.75rem);
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: -0.02em;
+	color: var(--sl-color-white);
+}
+:root[data-theme='light'] .why-title {
+	color: #14171f;
+}
+.why-desc {
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1.65;
+	color: var(--sl-color-gray-2);
+	max-width: 42ch;
+}
+.why-link {
+	margin-top: 0.4rem;
+	font-family: var(--brand-font-mono);
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--sl-color-text-accent);
+	text-decoration: none;
+	transition: transform 0.15s ease;
+}
+.why-link:hover {
+	transform: translateX(3px);
+}
+
+.why-visual {
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: var(--oi-radius-lg);
+	background: transparent;
+	overflow: hidden;
+}
+.why-visual img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+.why-visual-cap {
+	padding: 0.55rem 0.9rem;
+	font-family: var(--brand-font-mono);
+	font-size: 0.7rem;
+	color: var(--sl-color-gray-3);
+	border-top: 1px solid var(--sl-color-hairline);
+	background: transparent;
+	letter-spacing: 0.02em;
 }
 
 /* ───────────────── Landing-only (pages with a hero) ───────────────── */
@@ -140,66 +327,47 @@ body:has(.hero) .sl-markdown-content {
 	margin-top: 1rem;
 }
 
-/* Lead paragraph under the hero */
-.lead {
-	text-align: center;
-	max-width: 46ch;
-	margin-inline: auto;
-	font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
-	line-height: 1.6;
-	color: var(--sl-color-gray-2);
-}
-.lead .hl {
-	color: var(--sl-color-white);
-	font-weight: 600;
-	white-space: nowrap;
-	background: linear-gradient(120deg, var(--brand) 0%, var(--brand-2) 100%);
-	-webkit-background-clip: text;
-	background-clip: text;
-	-webkit-text-fill-color: transparent;
-}
-
 /* Center section intros on the landing page */
 body:has(.hero) .sl-markdown-content > h2 {
 	text-align: center;
 	font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
 	letter-spacing: -0.02em;
-	margin-top: 4rem;
+	margin-top: 6rem;
 	border: none;
 }
 
-/* Stats strip */
+/* ───────────────── Stats strip — Linearized ─────────────────
+   No heavy bordered box. Just two hairlines and big mono numbers. */
+
 .stats {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: 1px;
-	margin: 2.5rem auto 0;
+	gap: 1rem;
+	margin: 3rem auto 0;
 	max-width: 56rem;
-	background: var(--sl-color-hairline);
-	border: 1px solid var(--sl-color-hairline);
-	border-radius: 1rem;
-	overflow: hidden;
+	padding-block: 1.6rem;
+	border-top: 1px solid var(--sl-color-hairline);
+	border-bottom: 1px solid var(--sl-color-hairline);
 }
 .stat {
 	display: flex;
 	flex-direction: column;
-	gap: 0.35rem;
-	padding: 1.4rem 1rem;
-	background: color-mix(in srgb, var(--sl-color-bg) 92%, #fff 0%);
+	gap: 0.4rem;
 	text-align: center;
 }
 .stat-value {
 	font-family: var(--brand-font-mono);
-	font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.4rem);
-	font-weight: 800;
+	font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
+	font-weight: 700;
 	line-height: 1;
-	background: linear-gradient(180deg, var(--brand-2), var(--brand));
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
+	color: #f3f5fa;
+	letter-spacing: -0.02em;
+}
+:root[data-theme='light'] .stat-value {
+	color: #14171f;
 }
 .stat-label {
-	font-size: 0.78rem;
+	font-size: 0.76rem;
 	line-height: 1.4;
 	color: var(--sl-color-gray-3);
 	text-wrap: balance;
@@ -207,36 +375,31 @@ body:has(.hero) .sl-markdown-content > h2 {
 @media (max-width: 50rem) {
 	.stats {
 		grid-template-columns: repeat(2, 1fr);
+		gap: 1.4rem 1rem;
 	}
 }
 
-/* ───────────────────────── Cards ───────────────────────── */
+/* ───────────────────────── Cards ─────────────────────────
+   Subtler shadows, tighter radii, mono-line icons. */
 
 .card-grid {
 	margin-top: 2rem !important;
 }
 .card {
 	border: 1px solid var(--sl-color-hairline);
-	border-radius: 1rem;
-	background: linear-gradient(
-		180deg,
-		color-mix(in srgb, var(--sl-color-white) 3%, transparent),
-		transparent 60%
-	);
-	transition: transform 0.18s ease, border-color 0.18s ease,
-		box-shadow 0.18s ease;
+	border-radius: var(--oi-radius-lg);
+	background: transparent;
+	transition: border-color 0.15s ease;
 }
 .card:hover {
-	transform: translateY(-3px);
-	border-color: color-mix(in srgb, var(--brand) 45%, var(--sl-color-hairline));
-	box-shadow: 0 16px 40px -24px rgba(241, 83, 31, 0.55);
+	border-color: var(--sl-color-hairline-light);
 }
 .card .icon {
 	color: var(--brand-2);
-	border: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
-	background: color-mix(in srgb, var(--brand) 12%, transparent);
-	border-radius: 0.6rem;
-	padding: 0.35rem;
+	border: none;
+	background: none;
+	border-radius: var(--oi-radius);
+	padding: 0;
 }
 .card .title {
 	letter-spacing: -0.01em;
@@ -249,11 +412,11 @@ body:has(.hero) .sl-markdown-content > h2 {
 	border-spacing: 0;
 	width: 100%;
 	border: 1px solid var(--sl-color-hairline);
-	border-radius: 0.9rem;
+	border-radius: var(--oi-radius-lg);
 	overflow: hidden;
 }
 .sl-markdown-content th {
-	background: color-mix(in srgb, var(--sl-color-white) 4%, transparent);
+	background: transparent;
 	font-size: 0.78rem;
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
@@ -268,17 +431,64 @@ body:has(.hero) .sl-markdown-content > h2 {
 .sl-markdown-content tr:last-child td {
 	border-bottom: none;
 }
-.sl-markdown-content tbody tr {
-	transition: background 0.15s ease;
-}
 .sl-markdown-content tbody tr:hover {
-	background: color-mix(in srgb, var(--brand) 6%, transparent);
+	background: color-mix(in srgb, var(--sl-color-white) 3%, transparent);
 }
 
 /* Inline code accent on the landing page */
 body:has(.hero) .sl-markdown-content :not(pre) > code {
 	color: var(--sl-color-text-accent);
-	border-color: color-mix(in srgb, var(--brand) 25%, var(--sl-color-hairline));
+	border-color: color-mix(in srgb, var(--brand) 22%, var(--sl-color-hairline));
+}
+
+/* ───────────────────────── Supported models — clean row list ─────────────────
+   Tailscale-style: mono model name on the left, architecture description on
+   the right, hairline row separators, no heavy table borders or header row. */
+
+.model-list {
+	margin: 2rem 0;
+	border-top: 1px solid var(--sl-color-hairline);
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+.model-row {
+	display: grid;
+	grid-template-columns: minmax(9rem, 1fr) 2.2fr;
+	gap: 1.5rem;
+	padding: 0.85rem 0.25rem;
+	border-bottom: 1px solid var(--sl-color-hairline);
+	align-items: baseline;
+	transition: background 0.15s ease;
+}
+.model-row:last-child {
+	border-bottom: none;
+}
+.model-row:hover {
+	background: color-mix(in srgb, var(--sl-color-white) 2%, transparent);
+}
+.model-name {
+	font-family: var(--brand-font-mono);
+	font-weight: 600;
+	font-size: 0.95rem;
+	color: var(--sl-color-white);
+	letter-spacing: -0.01em;
+}
+a.model-name {
+	text-decoration: none;
+}
+a.model-name:hover {
+	color: var(--brand-2);
+}
+.model-arch {
+	color: var(--sl-color-gray-2);
+	font-size: 0.92rem;
+	line-height: 1.5;
+}
+@media (max-width: 40rem) {
+	.model-row {
+		grid-template-columns: 1fr;
+		gap: 0.2rem;
+		padding: 0.7rem 0.25rem;
+	}
 }
 
 /* Nav: a hairline that picks up the brand on scroll */

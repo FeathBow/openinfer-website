@@ -3,29 +3,42 @@ title: openinfer
 description: "Pure Rust + CUDA LLM inference engine — no PyTorch, OpenAI-compatible, serving models from Qwen3 to the trillion-parameter Kimi-K2."
 template: splash
 hero:
-  tagline: No Python at runtime. No GC. No framework tax.
-  image:
-    file: ../../assets/logo.png
+  title: No <span class="hl-word">Python</span> at runtime. No GC. No framework tax.
+  tagline: A from-scratch LLM inference engine in pure Rust + CUDA. OpenAI-compatible. Serves Qwen3 to Kimi-K2.
   actions:
     - text: Get Started
       link: /getting-started/
       icon: right-arrow
-    - text: Blogs
-      link: /blog/
-      icon: right-arrow
-      variant: minimal
     - text: View on GitHub
       link: https://github.com/openinfer-project/openinfer
-      icon: external
+      icon: github
       variant: minimal
+      attrs:
+        class: github-btn
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+## From the blog
 
-<p class="lead">
-	A from-scratch LLM inference engine in <span class="hl">pure Rust + CUDA</span>.
-	No PyTorch, no ONNX, no model framework runtime — just weights, kernels, and tokens.
-</p>
+<div class="blog-feature">
+	<a class="blog-card" href="/blog/green-ctx/">
+		<img src="/blog/green-ctx/image.png" alt="Green Contexts SM partitioning" loading="lazy" />
+		<div class="blog-card-body">
+			<time class="blog-date">2026-06-20</time>
+			<h3 class="blog-title">Co-locating Prefill and Decode on One GPU: Green Contexts for Higher Throughput</h3>
+			<p class="blog-desc">Using CUDA Green Contexts to split SMs and co-locate prefill + decode on one GPU — stabilizing decode latency (TPOT) without losing throughput. Benchmarked on RTX 5070 Ti and H200.</p>
+			<span class="blog-more">Read more →</span>
+		</div>
+	</a>
+	<a class="blog-card" href="/blog/openinfer-010/">
+		<img src="/blog/openinfer-010/arch.png" alt="OpenInfer architecture" loading="lazy" />
+		<div class="blog-card-body">
+			<time class="blog-date">2026-06-13</time>
+			<h3 class="blog-title">OpenInfer 0.1.0: Writing a Production-Grade Inference Engine in Rust</h3>
+			<p class="blog-desc">How we built openinfer 0.1.0 in pure Rust + CUDA with no PyTorch — the footprint and cold-start wins Rust bought us, RTX 5090 serving benchmarks, and the architecture behind them.</p>
+			<span class="blog-more">Read more →</span>
+		</div>
+	</a>
+</div>
 
 <div class="stats">
 	<div class="stat">
@@ -48,32 +61,59 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## Why openinfer
 
-<CardGrid stagger>
-	<Card title="Rust + CUDA, nothing else" icon="seti:rust">
-		The entire stack — weight loading, paged KV cache, schedulers, kernels —
-		is built from the ground up in Rust and CUDA, with Triton AOT and
-		FlashInfer kernels compiled at build time. Memory-safe orchestration,
-		hand-written kernels, and not a byte of Python in the serving path.
-	</Card>
-	<Card title="OpenAI-compatible API" icon="rocket">
-		Serves a `/v1/completions` endpoint with streaming. Point any OpenAI SDK
-		or `curl` at it and start generating — no client changes required.
-	</Card>
-	<Card title="One engine per model" icon="puzzle">
-		No universal model abstraction. Each model line owns its scheduler,
-		kernel plan, and execution path — full attention, hybrid linear
-		attention, MLA, and MoE with expert parallelism.
-	</Card>
-	<Card title="CUDA Graph decode" icon="setting">
-		The decode path is captured as a CUDA graph with pre-allocated buffers,
-		keeping per-token overhead low and decode latency flat across context
-		lengths.
-	</Card>
-	<Card title="Blogs" icon="rocket">
-		Read the [latest posts](/blog/) for release notes, benchmark writeups,
-		runtime design notes, and model bring-up stories.
-	</Card>
-</CardGrid>
+<div class="why-rows">
+	<div class="why-row">
+		<div class="why-text">
+			<span class="why-eyebrow">Footprint</span>
+			<h3 class="why-title">Rust + CUDA, nothing else</h3>
+			<p class="why-desc">No PyTorch, no JIT, no runtime compilation. The whole stack — weight loading, paged KV cache, schedulers, kernels — is Rust + CUDA from scratch. Resident memory stays a fraction of vLLM's at the same load.</p>
+			<a class="why-link" href="/blog/openinfer-010/#so-what-are-the-benefits-of-choosing-rust">Read the writeup →</a>
+		</div>
+		<figure class="why-visual">
+			<img src="/blog/openinfer-010/rss.png" alt="Process RSS: openinfer vs vLLM" loading="lazy" />
+			<figcaption class="why-visual-cap">Process RSS · openinfer vs vLLM · Qwen3-4B BF16</figcaption>
+		</figure>
+	</div>
+
+	<div class="why-row">
+		<div class="why-text">
+			<span class="why-eyebrow">Startup</span>
+			<h3 class="why-title">Cold start in seconds</h3>
+			<p class="why-desc">3s warm start vs vLLM's 32.7s — about 11×. No runtime compilation, no JIT warmup: once it's built, what ships is stable and predictable. Weights, kernels, tokens, and nothing else in the serving path.</p>
+			<a class="why-link" href="/blog/openinfer-010/#so-what-are-the-benefits-of-choosing-rust">Read the writeup →</a>
+		</div>
+		<figure class="why-visual">
+			<img src="/blog/openinfer-010/startup.png" alt="Cold start: openinfer vs vLLM" loading="lazy" />
+			<figcaption class="why-visual-cap">Warm start · openinfer 3.0s vs vLLM 32.7s</figcaption>
+		</figure>
+	</div>
+
+	<div class="why-row">
+		<div class="why-text">
+			<span class="why-eyebrow">Throughput</span>
+			<h3 class="why-title">Competitive with vLLM, lighter on RAM</h3>
+			<p class="why-desc">Same vLLM bench-serve client, same Poisson arrivals, same seed on RTX 5090. TTFT and TPOT move together at low load; at the saturation point openinfer pushes 6% higher throughput than vLLM 0.22.1.</p>
+			<a class="why-link" href="/blog/openinfer-010/#actual-measurements-of-inference-performance">Read the writeup →</a>
+		</div>
+		<figure class="why-visual">
+			<img src="/blog/openinfer-010/qps.png" alt="Serving sweep vs vLLM on RTX 5090" loading="lazy" />
+			<figcaption class="why-visual-cap">Serving sweep · RTX 5090 · vs vLLM 0.22.1</figcaption>
+		</figure>
+	</div>
+
+	<div class="why-row">
+		<div class="why-text">
+			<span class="why-eyebrow">Decode</span>
+			<h3 class="why-title">CUDA Graph decode + prefix cache</h3>
+			<p class="why-desc">Decode is captured as a CUDA graph with pre-allocated buffers, keeping per-token overhead low and decode latency flat across context lengths. Prefix-cache hits keep warm TTFT low even on long prompts.</p>
+			<a class="why-link" href="/blog/openinfer-010/#kv-cache-benchmark-my-old-line-of-work">Read the writeup →</a>
+		</div>
+		<figure class="why-visual">
+			<img src="/blog/openinfer-010/warm_ttft.png" alt="Warm prefix-cache-hit TTFT sweep" loading="lazy" />
+			<figcaption class="why-visual-cap">Warm prefix-cache TTFT · by input length</figcaption>
+		</figure>
+	</div>
+</div>
 
 ## Talk to it like OpenAI
 
@@ -88,10 +128,25 @@ unchanged. Add `"stream": true` for token-by-token streaming.
 
 ## Supported models
 
-| Model | Architecture |
-| --- | --- |
-| [Qwen3-4B / 8B](/models/qwen3-4b/) | Full attention, tensor parallel |
-| Qwen3.5-4B | Hybrid: 24 linear + 8 full attention layers |
-| DeepSeek-V4 | MoE + compressor + indexer, 8-GPU |
-| DeepSeek-V2-Lite | MoE + expert parallelism, 2-GPU |
-| Kimi-K2 | MLA + MoE + Marlin INT4, 8-GPU expert parallelism |
+<div class="model-list">
+	<div class="model-row">
+		<a class="model-name" href="/models/qwen3-4b/">Qwen3-4B / 8B</a>
+		<span class="model-arch">Full attention, tensor parallel</span>
+	</div>
+	<div class="model-row">
+		<span class="model-name">Qwen3.5-4B</span>
+		<span class="model-arch">Hybrid: 24 linear + 8 full attention layers</span>
+	</div>
+	<div class="model-row">
+		<span class="model-name">DeepSeek-V4</span>
+		<span class="model-arch">MoE + compressor + indexer, 8-GPU</span>
+	</div>
+	<div class="model-row">
+		<span class="model-name">DeepSeek-V2-Lite</span>
+		<span class="model-arch">MoE + expert parallelism, 2-GPU</span>
+	</div>
+	<div class="model-row">
+		<span class="model-name">Kimi-K2</span>
+		<span class="model-arch">MLA + MoE + Marlin INT4, 8-GPU expert parallelism</span>
+	</div>
+</div>
