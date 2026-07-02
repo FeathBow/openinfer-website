@@ -72,6 +72,25 @@ layers) and runs on the same single GPU — just point `--model-path` at the
 cargo run --release -- --model-path models/Qwen3-8B
 ```
 
+### Qwen3-32B
+
+Qwen3-32B's BF16 weights (~63 GB) need a single large-VRAM GPU
+(GH200/H200 class).
+
+```bash
+huggingface-cli download Qwen/Qwen3-32B --local-dir models/Qwen3-32B
+
+cargo run --release -- --model-path models/Qwen3-32B
+```
+
+Tool calling goes through `/v1/chat/completions` with a `tools` array; a
+`get_weather` round-trip returns:
+
+```json
+{"choices":[{"message":{"role":"assistant","tool_calls":[{"function":{"name":"get_weather",
+  "arguments":"{\"city\": \"Paris\"}"}}]},"finish_reason":"tool_calls"}]}
+```
+
 ## Performance
 
 Measured on **1x RTX 5090 32GB**, driver 590.48.01, CUDA 13.1 build,
@@ -125,6 +144,36 @@ around QPS 8:
 | 2 | 249.9 | 250.0 | 54.1 ms | 61.5 ms | 11.46 ms | 11.57 ms |
 | 4 | 498.6 | 498.5 | 88.1 ms | 103.6 ms | 16.08 ms | 16.24 ms |
 | 8 | 991.9 | 990.4 | 148.0 ms | 235.1 ms | 30.97 ms | 35.56 ms |
+
+### Qwen3-32B Serving Load
+
+Measured on **1x GH200 120GB** (aarch64, sm_90), openinfer main
+`5959f05`, Qwen3-32B BF16, TP1, CUDA Graph on. Load to HTTP-ready is
+46 s; the profiled KV budget is 21.4 GB (5360 blocks) next to the 63 GB
+of weights. QPS sweep with `vllm-bench`, Poisson arrivals, 1024-token
+prompts, 128-token outputs, greedy, seed 42 — reproducible via
+`tools/bench/run_serving_bench.sh` in the repo.
+
+| load | req/s | out tok/s | TTFT p50 / p99 | TPOT p50 / p99 |
+| ---: | ---: | ---: | ---: | ---: |
+| c=1 | 0.35 | 45 | 134 / 137 ms | 21.1 / 21.1 ms |
+| QPS 1 | 0.95 | 122 | 154 / 316 ms | 25.3 / 29.3 ms |
+| QPS 2 | 1.91 | 244 | 103 / 289 ms | 24.9 / 34.3 ms |
+| c=4 | 1.24 | 159 | 286 / 296 ms | 24.0 / 25.8 ms |
+| QPS 4 | 3.77 | 482 | 202 / 593 ms | 59.4 / 74.8 ms |
+| c=8 | 2.02 | 258 | 294 / 462 ms | 28.9 / 30.0 ms |
+| QPS 8 | 5.22 | 668 | 16.2 / 28.0 s | 107.2 / 107.5 ms |
+
+`c=N` rows hold N requests in flight; `QPS n` rows are Poisson arrivals.
+The single GPU saturates around 5.3 req/s and 680 output tok/s at this
+shape; past that (QPS 10–16) throughput stays flat and TTFT grows with
+queueing.
+
+Greedy output matches HF `transformers` (bf16, same GPU)
+token-for-token on 4 of 5 test prompts over the first 20 tokens. The
+fifth diverges at the second generated token, where HF's own top-4
+logits sit within a 0.375 spread and openinfer emits HF's second-ranked
+token, 0.25 below the top.
 
 ### Warm Prefix-Cache TTFT
 
@@ -221,9 +270,10 @@ DSpark is the recommended drafter for Qwen3-4B.
 ## Architecture Notes
 
 - Full attention with grouped-query attention: 32 query heads, 8 KV heads,
-  head dim 128, 36 layers.
-- Qwen3-4B and Qwen3-8B are the default pure Rust + CUDA build, with no
-  Python build dependency.
+  head dim 128, 36 layers. Qwen3-32B scales this to 64 query heads and 64
+  layers (GQA group 8).
+- Qwen3-4B, Qwen3-8B, and Qwen3-32B are the default pure Rust + CUDA
+  build, with no Python build dependency.
 - Paged KV cache uses full-lifetime admission, so requests that cannot fit
   are rejected instead of hanging under memory pressure.
 - Prefix cache is on by default; `--no-prefix-cache` disables GPU prefix
