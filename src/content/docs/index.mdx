@@ -1,121 +1,28 @@
 ---
 title: openinfer
 description: "Pure Rust + CUDA LLM inference engine — no PyTorch, OpenAI-compatible, serving models from Qwen3 to the trillion-parameter Kimi-K2."
-template: splash
-hero:
-  title: No <span class="hl-word">Python</span> at runtime. No GC. No framework tax.
-  tagline: A from-scratch LLM inference engine in pure Rust + CUDA. OpenAI-compatible. Serves Qwen3 to Kimi-K2.
-  actions:
-    - text: Get Started
-      link: /getting-started/
-      icon: right-arrow
-    - text: View on GitHub
-      link: https://github.com/openinfer-project/openinfer
-      icon: github
-      variant: minimal
-      attrs:
-        class: github-btn
 ---
 
-## From the blog
+A from-scratch LLM inference engine in pure Rust + CUDA. OpenAI-compatible. Serves Qwen3 to Kimi-K2.
 
-<div class="blog-feature">
-	<a class="blog-card" href="/blog/green-ctx/">
-		<img src="/blog/green-ctx/image.png" alt="Green Contexts SM partitioning" loading="lazy" />
-		<div class="blog-card-body">
-			<time class="blog-date">2026-06-20</time>
-			<h3 class="blog-title">Co-locating Prefill and Decode on One GPU: Green Contexts for Higher Throughput</h3>
-			<p class="blog-desc">Using CUDA Green Contexts to split SMs and co-locate prefill + decode on one GPU — stabilizing decode latency (TPOT) without losing throughput. Benchmarked on RTX 5070 Ti and H200.</p>
-			<span class="blog-more">Read more →</span>
-		</div>
-	</a>
-	<a class="blog-card" href="/blog/openinfer-010/">
-		<img src="/blog/openinfer-010/arch.png" alt="OpenInfer architecture" loading="lazy" />
-		<div class="blog-card-body">
-			<time class="blog-date">2026-06-13</time>
-			<h3 class="blog-title">OpenInfer 0.1.0: Writing a Production-Grade Inference Engine in Rust</h3>
-			<p class="blog-desc">How we built openinfer 0.1.0 in pure Rust + CUDA with no PyTorch — the footprint and cold-start wins Rust bought us, RTX 5090 serving benchmarks, and the architecture behind them.</p>
-			<span class="blog-more">Read more →</span>
-		</div>
-	</a>
-</div>
+## Highlights
 
-<div class="stats">
-	<div class="stat">
-		<span class="stat-value">0</span>
-		<span class="stat-label">Python · ONNX · framework at runtime</span>
-	</div>
-	<div class="stat">
-		<span class="stat-value">5</span>
-		<span class="stat-label">model lines, one engine each</span>
-	</div>
-	<div class="stat">
-		<span class="stat-value">8&#8209;GPU</span>
-		<span class="stat-label">expert parallelism</span>
-	</div>
-	<div class="stat">
-		<span class="stat-value">Rust</span>
-		<span class="stat-label">+ CUDA, loader to kernel</span>
-	</div>
-</div>
+- **No Python at runtime** — no PyTorch, no ONNX, no framework in the serving path.
+- **Five model lines**, one engine each — Qwen3 through Kimi-K2.
+- **Up to 8-GPU expert parallelism** for large MoE deployments.
+- **OpenAI-compatible API** — point any SDK at `http://localhost:8000/v1`.
 
-## Why openinfer
+See the [getting started guide](/getting-started/) or the [GitHub repository](https://github.com/openinfer-project/openinfer).
 
-<div class="why-rows">
-	<div class="why-row">
-		<div class="why-text">
-			<span class="why-eyebrow">Footprint</span>
-			<h3 class="why-title">Rust + CUDA, nothing else</h3>
-			<p class="why-desc">No PyTorch, no JIT, no runtime compilation. The whole stack — weight loading, paged KV cache, schedulers, kernels — is Rust + CUDA from scratch. Resident memory stays a fraction of vLLM's at the same load.</p>
-			<a class="why-link" href="/blog/openinfer-010/#so-what-are-the-benefits-of-choosing-rust">Read the writeup →</a>
-		</div>
-		<figure class="why-visual">
-			<img src="/blog/openinfer-010/rss.png" alt="Process RSS: openinfer vs vLLM" loading="lazy" />
-			<figcaption class="why-visual-cap">Process RSS · openinfer vs vLLM · Qwen3-4B BF16</figcaption>
-		</figure>
-	</div>
+## Quick start
 
-	<div class="why-row">
-		<div class="why-text">
-			<span class="why-eyebrow">Startup</span>
-			<h3 class="why-title">Cold start in seconds</h3>
-			<p class="why-desc">3s warm start vs vLLM's 32.7s — about 11×. No runtime compilation, no JIT warmup: once it's built, what ships is stable and predictable. Weights, kernels, tokens, and nothing else in the serving path.</p>
-			<a class="why-link" href="/blog/openinfer-010/#so-what-are-the-benefits-of-choosing-rust">Read the writeup →</a>
-		</div>
-		<figure class="why-visual">
-			<img src="/blog/openinfer-010/startup.png" alt="Cold start: openinfer vs vLLM" loading="lazy" />
-			<figcaption class="why-visual-cap">Warm start · openinfer 3.0s vs vLLM 32.7s</figcaption>
-		</figure>
-	</div>
+```bash
+git clone https://github.com/openinfer-project/openinfer
+cd openinfer
+cargo run --release -- --model-path models/Qwen3-4B
+```
 
-	<div class="why-row">
-		<div class="why-text">
-			<span class="why-eyebrow">Throughput</span>
-			<h3 class="why-title">Competitive with vLLM, lighter on RAM</h3>
-			<p class="why-desc">Same vLLM bench-serve client, same Poisson arrivals, same seed on RTX 5090. TTFT and TPOT move together at low load; at the saturation point openinfer pushes 6% higher throughput than vLLM 0.22.1.</p>
-			<a class="why-link" href="/blog/openinfer-010/#actual-measurements-of-inference-performance">Read the writeup →</a>
-		</div>
-		<figure class="why-visual">
-			<img src="/blog/openinfer-010/qps.png" alt="Serving sweep vs vLLM on RTX 5090" loading="lazy" />
-			<figcaption class="why-visual-cap">Serving sweep · RTX 5090 · vs vLLM 0.22.1</figcaption>
-		</figure>
-	</div>
-
-	<div class="why-row">
-		<div class="why-text">
-			<span class="why-eyebrow">Decode</span>
-			<h3 class="why-title">CUDA Graph decode + prefix cache</h3>
-			<p class="why-desc">Decode is captured as a CUDA graph with pre-allocated buffers, keeping per-token overhead low and decode latency flat across context lengths. Prefix-cache hits keep warm TTFT low even on long prompts.</p>
-			<a class="why-link" href="/blog/openinfer-010/#kv-cache-benchmark-my-old-line-of-work">Read the writeup →</a>
-		</div>
-		<figure class="why-visual">
-			<img src="/blog/openinfer-010/warm_ttft.png" alt="Warm prefix-cache-hit TTFT sweep" loading="lazy" />
-			<figcaption class="why-visual-cap">Warm prefix-cache TTFT · by input length</figcaption>
-		</figure>
-	</div>
-</div>
-
-## Talk to it like OpenAI
+Then send a request:
 
 ```bash
 curl -s http://localhost:8000/v1/completions \
@@ -123,30 +30,49 @@ curl -s http://localhost:8000/v1/completions \
   -d '{"prompt": "The capital of France is", "max_tokens": 32}'
 ```
 
-Set the base URL to `http://localhost:8000/v1` and any OpenAI SDK works
-unchanged. Add `"stream": true` for token-by-token streaming.
+## Blog
+
+- **[Co-locating Prefill and Decode on One GPU](/blog/green-ctx/)** (2026-06-20) — CUDA Green Contexts for stable decode latency without losing throughput.
+- **[OpenInfer 0.1.0: Production-Grade Rust Inference](/blog/openinfer-010/)** (2026-06-13) — Architecture, footprint, cold-start, and RTX 5090 serving benchmarks.
+
+## Footprint
+
+No PyTorch, no JIT, no runtime compilation. The whole stack — weight loading, paged KV cache, schedulers, kernels — is Rust + CUDA from scratch. Resident memory stays a fraction of vLLM's at the same load.
+
+![Process RSS: openinfer vs vLLM](/blog/openinfer-010/rss.png)
+
+*Process RSS · openinfer vs vLLM · Qwen3-4B BF16*
+
+## Startup
+
+3s warm start vs vLLM's 32.7s — about 11×. No runtime compilation, no JIT warmup: once it's built, what ships is stable and predictable.
+
+![Cold start: openinfer vs vLLM](/blog/openinfer-010/startup.png)
+
+*Warm start · openinfer 3.0s vs vLLM 32.7s*
+
+## Throughput
+
+Same vLLM bench-serve client, same Poisson arrivals, same seed on RTX 5090. At the saturation point openinfer pushes 6% higher throughput than vLLM 0.22.1.
+
+![Serving sweep vs vLLM on RTX 5090](/blog/openinfer-010/qps.png)
+
+*Serving sweep · RTX 5090 · vs vLLM 0.22.1*
+
+## Decode
+
+Decode is captured as a CUDA graph with pre-allocated buffers, keeping per-token overhead low and decode latency flat across context lengths.
+
+![Warm prefix-cache-hit TTFT sweep](/blog/openinfer-010/warm_ttft.png)
+
+*Warm prefix-cache TTFT · by input length*
 
 ## Supported models
 
-<div class="model-list">
-	<div class="model-row">
-		<a class="model-name" href="/models/qwen3-4b/">Qwen3-4B / 8B</a>
-		<span class="model-arch">Full attention, tensor parallel</span>
-	</div>
-	<div class="model-row">
-		<span class="model-name">Qwen3.5-4B</span>
-		<span class="model-arch">Hybrid: 24 linear + 8 full attention layers</span>
-	</div>
-	<div class="model-row">
-		<span class="model-name">DeepSeek-V4</span>
-		<span class="model-arch">MoE + compressor + indexer, 8-GPU</span>
-	</div>
-	<div class="model-row">
-		<span class="model-name">DeepSeek-V2-Lite</span>
-		<span class="model-arch">MoE + expert parallelism, 2-GPU</span>
-	</div>
-	<div class="model-row">
-		<span class="model-name">Kimi-K2</span>
-		<span class="model-arch">MLA + MoE + Marlin INT4, 8-GPU expert parallelism</span>
-	</div>
-</div>
+| Model | Architecture |
+| --- | --- |
+| [Qwen3-4B / 8B](/models/qwen3-4b/) | Full attention, tensor parallel |
+| Qwen3.5-4B | Hybrid: 24 linear + 8 full attention layers |
+| DeepSeek-V4 | MoE + compressor + indexer, 8-GPU |
+| DeepSeek-V2-Lite | MoE + expert parallelism, 2-GPU |
+| Kimi-K2 | MLA + MoE + Marlin INT4, 8-GPU expert parallelism |

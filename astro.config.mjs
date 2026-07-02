@@ -11,17 +11,61 @@ const OG_IMAGE = `${SITE}/favicon.png`;
 // https://astro.build/config
 export default defineConfig({
 	site: SITE,
+	trailingSlash: 'always',
 	integrations: [
 		sitemap(),
 		starlight({
 			title: 'openinfer',
-			logo: { src: './src/assets/logo.png' },
+			logo: { src: './src/assets/logo.png', alt: 'openinfer' },
 			favicon: '/favicon.png',
 			customCss: ['./src/styles/custom.css'],
+			expressiveCode: {
+				styleOverrides: {
+					borderRadius: '0.375rem',
+					borderWidth: '1px',
+					codeFontSize: '0.8125rem',
+					codeLineHeight: '1.65',
+					frames: {
+						frameBoxShadowCssValue: 'none',
+					},
+				},
+				plugins: [
+					{
+						name: 'openinfer-plain-code',
+						hooks: {
+							preprocessCode: ({ codeBlock }) => {
+								// uv-style: plain code blocks unless frame= is set explicitly
+								if (codeBlock.metaOptions.getString('frame') === undefined) {
+									codeBlock.props.frame = 'none';
+								}
+							},
+						},
+					},
+				],
+			},
 			// Starlight already emits <title>, description, og:title/description/url,
 			// canonical, and twitter:card=summary_large_image. These fill the gaps:
 			// a social preview image and SoftwareApplication structured data.
 			head: [
+				{
+					tag: 'link',
+					attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+				},
+				{
+					tag: 'link',
+					attrs: {
+						rel: 'preconnect',
+						href: 'https://fonts.gstatic.com',
+						crossorigin: true,
+					},
+				},
+				{
+					tag: 'link',
+					attrs: {
+						rel: 'stylesheet',
+						href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400&family=Roboto+Mono:ital,wght@0,400;0,500;1,400&display=swap',
+					},
+				},
 				{ tag: 'meta', attrs: { property: 'og:image', content: OG_IMAGE } },
 				{ tag: 'meta', attrs: { name: 'twitter:image', content: OG_IMAGE } },
 				{
@@ -51,24 +95,24 @@ export default defineConfig({
 				},
 			],
 			sidebar: [
-				{ label: 'Getting Started', slug: 'getting-started' },
+				{ label: 'Getting Started', link: '/getting-started/' },
 				{
 					label: 'Blogs',
 					items: [
-						{ label: 'All Posts', slug: 'blog' },
+						{ label: 'All Posts', link: '/blog/' },
 						{
 							label: 'OpenInfer 0.1.0: Production-Grade Rust Inference',
-							slug: 'blog/openinfer-010',
+							link: '/blog/openinfer-010/',
 						},
 						{
 							label: 'Co-locating Prefill and Decode',
-							slug: 'blog/green-ctx',
+							link: '/blog/green-ctx/',
 						},
 					],
 				},
 				{
 					label: 'Models',
-					items: [{ label: 'Qwen3-4B', slug: 'models/qwen3-4b' }],
+					items: [{ label: 'Qwen3-4B', link: '/models/qwen3-4b/' }],
 				},
 			],
 		}),

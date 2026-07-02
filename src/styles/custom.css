@@ -1,498 +1,332 @@
-/* openinfer — custom theme
-   Rust-orange accent on a deep navy base, matched to the Pegasus mark.
-   Aesthetic: Tailscale-style minimalism — flat, hairline borders, no glows,
-   no shadows, generous whitespace, monospace for technical labels. */
+/* openinfer — uv / Astral docs style
+   Roboto + Roboto Mono (same as uv docs). Plain code blocks, no terminal chrome. */
 
-:root {
-	--brand: #f1531f; /* rust orange */
-	--brand-2: #ff8a3d; /* warm amber */
-	--brand-cool: #5b8def; /* CUDA blue, used sparingly */
-
-	/* Starlight accent ramp (links, focus rings, primary button) */
-	--sl-color-accent-low: #2c1206;
-	--sl-color-accent: #e64a1d;
-	--sl-color-accent-high: #ffc2ab;
-	--sl-color-text-accent: #ff7a45;
-
-	/* Navy-tinted surfaces */
-	--sl-color-bg: #0b0e16;
-	--sl-color-bg-nav: rgba(11, 14, 22, 0.72);
-	--sl-color-bg-sidebar: #090b12;
-	--sl-color-hairline: #161b29;
-	--sl-color-hairline-light: #232b3d;
-	--sl-color-hairline-shade: #11151f;
-
-	--brand-font-mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono',
-		'Cascadia Code', Menlo, Consolas, monospace;
-
-	/* Small radii — Tailscale-style engineering restraint. */
-	--oi-radius: 0.4rem;
-	--oi-radius-lg: 0.5rem;
-}
-
-/* Light theme: keep accent legible, soften surfaces.
-   NOTE: custom.css is unlayered, so it beats Starlight's layered props.css
-   regardless of specificity. That means every token we set in the dark `:root`
-   above must be explicitly re-set here for light mode, or it leaks through. */
+:root,
 :root[data-theme='light'] {
-	--sl-color-accent-low: #ffe6da;
-	--sl-color-accent: #d6431a;
-	--sl-color-accent-high: #5a1c0c;
-	--sl-color-text-accent: #c83e16;
-	--sl-color-bg: #fbfaf9;
-	--sl-color-bg-nav: rgba(251, 250, 249, 0.82);
-	--sl-color-bg-sidebar: #f4f2f0;
-	--sl-color-hairline: #e7e2db;
-	--sl-color-hairline-light: #d3cdc4;
-	--sl-color-hairline-shade: #f2efe9;
+	--sl-font: 'Roboto', var(--sl-font-system);
+	--sl-font-mono: 'Roboto Mono', var(--sl-font-system-mono);
+
+	--oi-accent: #526cfe;
+	--oi-accent-hover: #3d56e8;
+
+	--sl-color-accent-low: #eef1ff;
+	--sl-color-accent: var(--oi-accent);
+	--sl-color-accent-high: #1e3a8a;
+	--sl-color-text-accent: var(--oi-accent);
+
+	--sl-color-bg: #ffffff;
+	--sl-color-bg-nav: #ffffff;
+	--sl-color-bg-sidebar: #fafafa;
+	--sl-color-hairline: #e8eaef;
+	--sl-color-hairline-light: #d8dce6;
+	--sl-color-hairline-shade: #f4f5f7;
+
+	--sl-color-gray-1: #1b1f28;
+	--sl-color-gray-2: #4b5568;
+	--sl-color-gray-3: #6b7385;
+	--sl-color-gray-4: #9aa3b5;
+	--sl-color-gray-5: #e8eaef;
+	--sl-color-gray-6: #f4f5f7;
+	--sl-color-white: #1b1f28;
+	--sl-color-black: #ffffff;
+
+	--sl-color-text: var(--sl-color-gray-2);
+	--sl-color-bg-inline-code: #f4f5f7;
 }
 
-/* ───────────────────────── Hero ───────────────────────── */
+:root[data-theme='dark'] {
+	--oi-accent: #8b9cff;
+	--oi-accent-hover: #a8b4ff;
+	--oi-brand: #ff8a55;
+	--oi-brand-dim: #e64a1d;
 
-.hero {
-	position: relative;
-	padding-block: clamp(2.5rem, 10vh, 6rem);
-	grid-template-columns: 1fr !important;
-}
-.hero .stack,
-.hero .copy,
-.hero .actions {
-	text-align: center;
-	align-items: center;
-	justify-content: center;
-}
-.hero .copy > * {
-	max-width: 46ch;
+	--sl-color-accent-low: #1c2238;
+	--sl-color-accent: var(--oi-accent);
+	--sl-color-accent-high: #c7d4ff;
+	--sl-color-text-accent: #9cb0ff;
+
+	/* Layered surfaces — sidebar / page / content */
+	--sl-color-bg: #0c0e14;
+	--sl-color-bg-nav: #0c0e14;
+	--sl-color-bg-sidebar: #080a0f;
+	--sl-color-hairline: #222836;
+	--sl-color-hairline-light: #2e3548;
+	--sl-color-hairline-shade: #06080c;
+
+	--sl-color-gray-1: #eef0f6;
+	--sl-color-gray-2: #b8bfd0;
+	--sl-color-gray-3: #7d869c;
+	--sl-color-gray-4: #525c72;
+	--sl-color-gray-5: #222836;
+	--sl-color-gray-6: #141820;
+	--sl-color-white: #eef0f6;
+	--sl-color-black: #0c0e14;
+
+	--sl-color-text: var(--sl-color-gray-2);
+	--sl-color-bg-inline-code: #161922;
 }
 
-.hero h1 {
+/* ── Global ── */
+
+body {
+	-webkit-font-smoothing: antialiased;
+}
+
+header.header {
+	border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.site-title {
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover {
+	background: var(--sl-color-accent-low);
+	color: var(--sl-color-text-accent);
+	font-weight: 500;
+}
+
+.sl-markdown-content {
+	--sl-content-width: 48rem;
+	line-height: 1.75;
+}
+
+.sl-markdown-content h1 {
+	font-size: clamp(2rem, 1.5rem + 2vw, 2.5rem);
 	font-weight: 700;
 	letter-spacing: -0.03em;
-	line-height: 1.05;
-	color: #f3f5fa;
-	/* No full gradient — cool neutral white, accent reserved for one word. */
-	background: none;
-	-webkit-text-fill-color: initial;
-}
-:root[data-theme='light'] .hero h1 {
-	color: #14171f;
-	background: none;
-	-webkit-text-fill-color: initial;
-}
-/* The one highlighted word in the headline — only place the brand speaks loud.
-   Solid color, no gradient. */
-.hero h1 .hl-word {
-	color: var(--brand-2);
+	line-height: 1.15;
+	margin-bottom: 0.75rem;
+	color: var(--sl-color-gray-1);
 }
 
-.hero .tagline {
-	font-size: clamp(1rem, 0.95rem + 0.4vw, 1.2rem);
-	line-height: 1.55;
-	color: var(--sl-color-gray-2);
-	max-width: 38ch;
-	font-weight: 400;
-}
-
-/* Action buttons — flat, matched visual weight. No shadows, no hover lift;
-   hover is communicated by background/border color change only.
-   Override Starlight's pill (999rem) and the minimal variant's
-   `padding-inline: 0` (which makes it look like a bare link next to primary). */
-.hero .actions {
-	gap: 0.75rem;
-	flex-wrap: wrap;
-	justify-content: center;
-}
-.hero .actions a {
-	border-radius: var(--oi-radius);
-	font-weight: 600;
-	padding: 0.65rem 1.1rem !important;
-	font-size: var(--sl-text-base) !important;
-	line-height: 1.2;
-	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-/* Primary: solid rust-orange. Hover deepens, no shadow, no lift. */
-.hero .actions a.primary {
-	background: var(--brand);
-	border: 1px solid var(--brand);
-	color: #fff;
-}
-.hero .actions a.primary:hover {
-	background: var(--brand-2);
-	border-color: var(--brand-2);
-}
-
-/* Secondary/minimal: real button, not a bare link. Hairline border + near-flat
-   surface. `--sl-color-white` is semantic (white in dark, dark in light) so the
-   text + icon stay legible in both themes. */
-.hero .actions a.minimal {
-	background: transparent;
-	border: 1px solid var(--sl-color-hairline-light);
-	color: var(--sl-color-white);
-	padding-inline: 1.1rem !important;
-}
-.hero .actions a.minimal:hover {
-	border-color: color-mix(in srgb, var(--brand) 50%, var(--sl-color-hairline-light));
-	color: var(--brand-2);
-}
-
-/* GitHub button: brand mark sits before the label. */
-.hero .actions a.github-btn {
-	flex-direction: row-reverse;
-}
-
-/* ───────────────────────── Blog feature cards ─────────────────────────
-   Prime real estate on the landing page. Two posts, banner image, date,
-   title, excerpt, and a "Read more" affordance. */
-
-.blog-feature {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 1.25rem;
-	margin: 2rem 0 1rem;
-}
-@media (max-width: 50rem) {
-	.blog-feature {
-		grid-template-columns: 1fr;
-		gap: 1rem;
-	}
-}
-
-.blog-card {
-	display: flex;
-	flex-direction: column;
-	border: 1px solid var(--sl-color-hairline);
-	border-radius: var(--oi-radius-lg);
-	background: transparent;
-	overflow: hidden;
-	text-decoration: none;
-	color: inherit;
-	transition: border-color 0.15s ease;
-}
-.blog-card:hover {
-	border-color: var(--sl-color-hairline-light);
-}
-.blog-card img {
-	display: block;
-	width: 100%;
-	height: 12rem;
-	object-fit: cover;
-	background: var(--sl-color-hairline);
-	border-bottom: 1px solid var(--sl-color-hairline);
-}
-.blog-card-body {
-	display: flex;
-	flex-direction: column;
-	gap: 0.55rem;
-	padding: 1.1rem 1.25rem 1.25rem;
-}
-.blog-date {
-	font-family: var(--brand-font-mono);
-	font-size: 0.75rem;
-	font-weight: 600;
-	color: var(--brand-2);
-	letter-spacing: 0.02em;
-}
-.blog-title {
-	margin: 0;
-	font-size: clamp(1.05rem, 1rem + 0.3vw, 1.25rem);
-	font-weight: 700;
-	line-height: 1.3;
-	letter-spacing: -0.01em;
-	color: var(--sl-color-white);
-}
-:root[data-theme='light'] .blog-title {
-	color: #14171f;
-}
-.blog-desc {
-	margin: 0;
-	font-size: 0.9rem;
-	line-height: 1.55;
-	color: var(--sl-color-gray-3);
-}
-.blog-more {
-	margin-top: 0.25rem;
-	font-family: var(--brand-font-mono);
-	font-size: 0.8rem;
-	font-weight: 600;
-	color: var(--sl-color-text-accent);
-	transition: transform 0.15s ease;
-}
-.blog-card:hover .blog-more {
-	transform: translateX(3px);
-}
-
-/* ───────────────────────── Why openinfer — alternating rows ─────────────────
-   Linear/Modal-style feature rows: text on one side, benchmark chart on the
-   other, alternating sides. Each point gets room to breathe. */
-
-.why-rows {
-	margin: 3rem 0 1rem;
-	display: flex;
-	flex-direction: column;
-	gap: clamp(4rem, 3rem + 4vw, 7rem);
-}
-.why-row {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: clamp(2rem, 1.5rem + 2vw, 4rem);
-	align-items: center;
-}
-/* Flip even rows: image on the left, text on the right. */
-.why-row:nth-child(even) .why-text {
-	order: 2;
-}
-.why-row:nth-child(even) .why-visual {
-	order: 1;
-}
-@media (max-width: 50rem) {
-	.why-row {
-		grid-template-columns: 1fr;
-		gap: 1.25rem;
-	}
-	.why-row:nth-child(even) .why-text,
-	.why-row:nth-child(even) .why-visual {
-		order: 0;
-	}
-}
-
-.why-text {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-}
-.why-eyebrow {
-	font-family: var(--brand-font-mono);
-	font-size: 0.72rem;
-	font-weight: 700;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	color: var(--brand-2);
-}
-.why-title {
-	margin: 0;
-	font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.75rem);
-	font-weight: 700;
-	line-height: 1.2;
-	letter-spacing: -0.02em;
-	color: var(--sl-color-white);
-}
-:root[data-theme='light'] .why-title {
-	color: #14171f;
-}
-.why-desc {
-	margin: 0;
-	font-size: 1rem;
+/* First paragraph after title — uv-style lead */
+.sl-markdown-content > p:first-of-type {
+	font-size: 1.125rem;
 	line-height: 1.65;
 	color: var(--sl-color-gray-2);
-	max-width: 42ch;
+	margin-bottom: 2rem;
 }
-.why-link {
-	margin-top: 0.4rem;
-	font-family: var(--brand-font-mono);
-	font-size: 0.82rem;
+
+.sl-markdown-content h2 {
+	font-size: 1.375rem;
 	font-weight: 600;
+	letter-spacing: -0.02em;
+	margin-top: 2.5rem;
+	margin-bottom: 0.75rem;
+	padding-bottom: 0;
+	border: none;
+	color: var(--sl-color-gray-1);
+}
+
+.sl-markdown-content h3 {
+	font-size: 1.125rem;
+	font-weight: 600;
+	margin-top: 1.75rem;
+	color: var(--sl-color-gray-1);
+}
+
+.sl-markdown-content a:not([class]) {
 	color: var(--sl-color-text-accent);
 	text-decoration: none;
-	transition: transform 0.15s ease;
-}
-.why-link:hover {
-	transform: translateX(3px);
 }
 
-.why-visual {
-	border: 1px solid var(--sl-color-hairline);
-	border-radius: var(--oi-radius-lg);
-	background: transparent;
-	overflow: hidden;
+.sl-markdown-content a:not([class]):hover {
+	color: var(--oi-accent-hover);
+	text-decoration: underline;
+	text-underline-offset: 0.15em;
 }
-.why-visual img {
+
+.sl-markdown-content ul {
+	padding-left: 1.25rem;
+}
+
+.sl-markdown-content li {
+	margin-block: 0.35rem;
+}
+
+.sl-markdown-content li::marker {
+	color: var(--sl-color-gray-3);
+}
+
+.sl-markdown-content :not(pre) > code {
+	font-size: 0.875em;
+	color: var(--sl-color-gray-1);
+	background: var(--sl-color-bg-inline-code);
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 0.25rem;
+	padding: 0.1em 0.35em;
+}
+
+.sl-markdown-content pre {
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 0.375rem;
+	font-size: 0.875rem;
+}
+
+.sl-markdown-content img {
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 0.375rem;
+	margin-block: 1rem;
+}
+
+.sl-markdown-content p:has(> em:only-child) > em {
 	display: block;
-	width: 100%;
-	height: auto;
-}
-.why-visual-cap {
-	padding: 0.55rem 0.9rem;
-	font-family: var(--brand-font-mono);
-	font-size: 0.7rem;
+	margin-top: -0.5rem;
+	margin-bottom: 1.5rem;
+	font-size: 0.8125rem;
+	font-style: normal;
 	color: var(--sl-color-gray-3);
-	border-top: 1px solid var(--sl-color-hairline);
-	background: transparent;
-	letter-spacing: 0.02em;
 }
-
-/* ───────────────── Landing-only (pages with a hero) ───────────────── */
-
-body:has(.hero) .sl-markdown-content {
-	margin-top: 1rem;
-}
-
-/* Center section intros on the landing page */
-body:has(.hero) .sl-markdown-content > h2 {
-	text-align: center;
-	font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
-	letter-spacing: -0.02em;
-	margin-top: 6rem;
-	border: none;
-}
-
-/* ───────────────── Stats strip — Linearized ─────────────────
-   No heavy bordered box. Just two hairlines and big mono numbers. */
-
-.stats {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 1rem;
-	margin: 3rem auto 0;
-	max-width: 56rem;
-	padding-block: 1.6rem;
-	border-top: 1px solid var(--sl-color-hairline);
-	border-bottom: 1px solid var(--sl-color-hairline);
-}
-.stat {
-	display: flex;
-	flex-direction: column;
-	gap: 0.4rem;
-	text-align: center;
-}
-.stat-value {
-	font-family: var(--brand-font-mono);
-	font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
-	font-weight: 700;
-	line-height: 1;
-	color: #f3f5fa;
-	letter-spacing: -0.02em;
-}
-:root[data-theme='light'] .stat-value {
-	color: #14171f;
-}
-.stat-label {
-	font-size: 0.76rem;
-	line-height: 1.4;
-	color: var(--sl-color-gray-3);
-	text-wrap: balance;
-}
-@media (max-width: 50rem) {
-	.stats {
-		grid-template-columns: repeat(2, 1fr);
-		gap: 1.4rem 1rem;
-	}
-}
-
-/* ───────────────────────── Cards ─────────────────────────
-   Subtler shadows, tighter radii, mono-line icons. */
-
-.card-grid {
-	margin-top: 2rem !important;
-}
-.card {
-	border: 1px solid var(--sl-color-hairline);
-	border-radius: var(--oi-radius-lg);
-	background: transparent;
-	transition: border-color 0.15s ease;
-}
-.card:hover {
-	border-color: var(--sl-color-hairline-light);
-}
-.card .icon {
-	color: var(--brand-2);
-	border: none;
-	background: none;
-	border-radius: var(--oi-radius);
-	padding: 0;
-}
-.card .title {
-	letter-spacing: -0.01em;
-}
-
-/* ───────────────────────── Tables ───────────────────────── */
 
 .sl-markdown-content table {
-	border-collapse: separate;
-	border-spacing: 0;
+	border-collapse: collapse;
 	width: 100%;
-	border: 1px solid var(--sl-color-hairline);
-	border-radius: var(--oi-radius-lg);
-	overflow: hidden;
+	font-size: 0.9375rem;
 }
-.sl-markdown-content th {
-	background: transparent;
-	font-size: 0.78rem;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	color: var(--sl-color-gray-2);
-}
+
 .sl-markdown-content th,
 .sl-markdown-content td {
-	border: none;
-	border-bottom: 1px solid var(--sl-color-hairline);
-	padding: 0.7rem 1rem;
+	border: 1px solid var(--sl-color-hairline);
+	padding: 0.6rem 0.85rem;
+	text-align: left;
 }
-.sl-markdown-content tr:last-child td {
-	border-bottom: none;
+
+.sl-markdown-content th {
+	font-weight: 600;
+	background: var(--sl-color-bg-sidebar);
+	color: var(--sl-color-gray-1);
 }
+
 .sl-markdown-content tbody tr:hover {
-	background: color-mix(in srgb, var(--sl-color-white) 3%, transparent);
+	background: color-mix(in srgb, var(--sl-color-accent) 4%, transparent);
 }
 
-/* Inline code accent on the landing page */
-body:has(.hero) .sl-markdown-content :not(pre) > code {
-	color: var(--sl-color-text-accent);
-	border-color: color-mix(in srgb, var(--brand) 22%, var(--sl-color-hairline));
+/* Expressive Code — uv-style plain blocks (no terminal title bar) */
+.expressive-code {
+	margin-block: 1.25rem;
 }
 
-/* ───────────────────────── Supported models — clean row list ─────────────────
-   Tailscale-style: mono model name on the left, architecture description on
-   the right, hairline row separators, no heavy table borders or header row. */
+.expressive-code .frame {
+	box-shadow: none !important;
+	border-radius: 0.375rem;
+}
 
-.model-list {
-	margin: 2rem 0;
+.expressive-code .frame pre {
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 0.375rem;
+	font-family: var(--sl-font-mono);
+	font-size: 0.8125rem;
+	line-height: 1.65;
+}
+
+.expressive-code .frame.is-terminal .header,
+.expressive-code .frame.has-title .header,
+.expressive-code .frame .header:empty {
+	display: none !important;
+}
+
+.expressive-code .frame.is-terminal pre,
+.expressive-code .frame.has-title pre {
 	border-top: 1px solid var(--sl-color-hairline);
+	border-top-left-radius: 0.375rem;
+	border-top-right-radius: 0.375rem;
+}
+
+.expressive-code .copy button {
+	opacity: 0.5;
+}
+
+.expressive-code .frame:hover .copy button {
+	opacity: 0.85;
+}
+
+/* ── Dark mode depth (still doc-first, not marketing) ── */
+
+:root[data-theme='dark'] header.header {
+	background: color-mix(in srgb, var(--sl-color-bg-nav) 92%, #000);
+	border-bottom-color: var(--sl-color-hairline);
+}
+
+:root[data-theme='dark'] .site-title {
+	color: var(--sl-color-gray-1);
+}
+
+:root[data-theme='dark'] .site-title img {
+	filter: brightness(1.05);
+}
+
+:root[data-theme='dark'] .sidebar-pane {
+	border-inline-end: 1px solid var(--sl-color-hairline);
+	background: var(--sl-color-bg-sidebar);
+}
+
+:root[data-theme='dark'] .sidebar-content a {
+	border-radius: 0.375rem;
+	color: var(--sl-color-gray-2);
+}
+
+:root[data-theme='dark'] .sidebar-content a:hover {
+	background: color-mix(in srgb, var(--sl-color-white) 5%, transparent);
+	color: var(--sl-color-gray-1);
+}
+
+:root[data-theme='dark'] .sidebar-content a[aria-current='page'],
+:root[data-theme='dark'] .sidebar-content a[aria-current='page']:hover {
+	background: color-mix(in srgb, var(--oi-brand) 12%, var(--sl-color-accent-low));
+	color: var(--oi-brand);
+	box-shadow: inset 2px 0 0 var(--oi-brand);
+	border-radius: 0 0.375rem 0.375rem 0;
+}
+
+:root[data-theme='dark'] .content-panel {
+	background: #10131a;
+}
+
+:root[data-theme='dark'] .content-panel + .content-panel {
+	border-top: 1px solid var(--sl-color-hairline);
+}
+
+:root[data-theme='dark'] .sl-markdown-content > p:first-of-type {
+	color: var(--sl-color-gray-2);
+}
+
+:root[data-theme='dark'] .sl-markdown-content h2 {
+	padding-bottom: 0.5rem;
 	border-bottom: 1px solid var(--sl-color-hairline);
 }
-.model-row {
-	display: grid;
-	grid-template-columns: minmax(9rem, 1fr) 2.2fr;
-	gap: 1.5rem;
-	padding: 0.85rem 0.25rem;
-	border-bottom: 1px solid var(--sl-color-hairline);
-	align-items: baseline;
-	transition: background 0.15s ease;
+
+:root[data-theme='dark'] .sl-markdown-content :not(pre) > code {
+	color: #f0c4b0;
+	background: color-mix(in srgb, var(--oi-brand) 10%, var(--sl-color-bg-inline-code));
+	border-color: color-mix(in srgb, var(--oi-brand) 22%, var(--sl-color-hairline));
 }
-.model-row:last-child {
-	border-bottom: none;
+
+:root[data-theme='dark'] .sl-markdown-content li::marker {
+	color: var(--oi-brand);
 }
-.model-row:hover {
+
+:root[data-theme='dark'] .sl-markdown-content img {
+	border-color: var(--sl-color-hairline-light);
 	background: color-mix(in srgb, var(--sl-color-white) 2%, transparent);
 }
-.model-name {
-	font-family: var(--brand-font-mono);
-	font-weight: 600;
-	font-size: 0.95rem;
-	color: var(--sl-color-white);
-	letter-spacing: -0.01em;
-}
-a.model-name {
-	text-decoration: none;
-}
-a.model-name:hover {
-	color: var(--brand-2);
-}
-.model-arch {
-	color: var(--sl-color-gray-2);
-	font-size: 0.92rem;
-	line-height: 1.5;
-}
-@media (max-width: 40rem) {
-	.model-row {
-		grid-template-columns: 1fr;
-		gap: 0.2rem;
-		padding: 0.7rem 0.25rem;
-	}
+
+:root[data-theme='dark'] .sl-markdown-content th {
+	background: #161922;
 }
 
-/* Nav: a hairline that picks up the brand on scroll */
-.hero ~ * {
-	position: relative;
-	z-index: 1;
+:root[data-theme='dark'] .expressive-code .frame pre {
+	border-color: var(--sl-color-hairline-light);
+	background: #0a0d12;
+	box-shadow: inset 0 1px 0 color-mix(in srgb, var(--sl-color-white) 4%, transparent);
+}
+
+:root[data-theme='dark'] .right-sidebar-panel {
+	border-inline-start: 1px solid var(--sl-color-hairline);
+}
+
+:root[data-theme='dark'] starlight-toc a[aria-current='true'] {
+	color: var(--oi-brand);
 }
